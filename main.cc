@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -82,5 +83,58 @@ class Fraction {
 
 };
 
-
-
+string convert_string(const string &source) {
+  stringstream ss;
+  vector<char> stk;
+  for (size_t i = 0; i < source.length(); i++) {
+	if (source.at(i) == ' '){
+	  continue;
+	}
+	else if (isdigit(source.at(i)) || source.at(i) == '/') {
+	  ss << source.at(i);
+	  // 如果下一位不是数字，或者已经是最后一位，就加上空格
+//	  if ((i < source.length() - 1 && !isdigit(source.at(i + 1)))
+//		  || i == source.length() - 1) {
+//		ss << " ";
+//	  }
+	}
+	else {
+	  ss << " ";
+	  if (stk.empty()) {
+		stk.push_back(source.at(i));
+	  }
+	  else {
+		switch (source.at(i)) {
+		  case '+':
+		  case '-': {
+			// '+' '-' '*' '/'都出栈
+			while (!stk.empty()) {
+			  ss << stk.back();
+			  ss << " ";
+			  stk.pop_back();
+			}
+			stk.push_back(source.at(i));
+			break;
+		  }
+		  case '*': {
+			// '*'出栈
+			while (!stk.empty() && stk.back() == '*'){
+			  ss << stk.back();
+			  ss << " ";
+			  stk.pop_back();
+			}
+			stk.push_back(source.at(i));
+			break;
+		  }
+		}
+	  }
+	}
+  }
+  // 最后元素需要pop出来
+  while (!stk.empty()) {
+	ss << stk.back();
+	ss << " ";
+	stk.pop_back();
+  }
+  return ss.str();
+}

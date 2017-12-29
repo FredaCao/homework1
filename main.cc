@@ -87,6 +87,10 @@ class Fraction {
 
 };
 
+ostream &operator<<(ostream &s, Fraction f){
+  s << f.numerator_ << '/' << f.denominator_;
+}
+
 string convert_string(const string &source) {
   stringstream ss;
   vector<char> stk;
@@ -162,3 +166,4 @@ Fraction Calculate(const string &source) {
 
   return fractions[0];
 }
+

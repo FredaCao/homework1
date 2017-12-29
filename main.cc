@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <string>
 #include <sstream>
 
 using namespace std;
@@ -25,21 +24,29 @@ inline int Split(const string &src, string split_flag, vector<string> &result) {
 
 class Fraction {
  public:
-  explicit Fraction(const string &source) : numerator_(0), denominator_(1){
+  Fraction(const Fraction &other) : numerator_(other.numerator_), denominator_(other.denominator_) {}
+
+  explicit Fraction(const string &source) : numerator_(0), denominator_(1) {
 	vector<string> vec;
 	int len = Split(source, "/", vec);
-	if (len == 1){
+	if (len == 1) {
 	  numerator_ = stoi(vec[0]);
-	}
-	else {
+	} else {
 	  numerator_ = stoi(vec[0]);
 	  denominator_ = stoi(vec[1]);
 	}
   }
+
+  Fraction &operator=(const Fraction &other) {
+	numerator_ = other.numerator_;
+	denominator_ = other.denominator_;
+	return *this;
+  }
+
   int numerator_;
   int denominator_;
 
-  Fraction &operator+=(const Fraction &other){
+  Fraction &operator+=(const Fraction &other) {
 	int new_denominator = denominator_ * other.denominator_;
 	int new_numerator = numerator_ * other.denominator_ + other.numerator_ * denominator_;
 	int cur_gcd = gcd(new_denominator, new_numerator);
@@ -47,7 +54,7 @@ class Fraction {
 	numerator_ = new_numerator / cur_gcd;
   }
 
-  Fraction &operator-=(const Fraction &other){
+  Fraction &operator-=(const Fraction &other) {
 	int new_denominator = denominator_ * other.denominator_;
 	int new_numerator = numerator_ * other.denominator_ - other.numerator_ * denominator_;
 	int cur_gcd = gcd(new_denominator, new_numerator);
@@ -55,7 +62,7 @@ class Fraction {
 	numerator_ = new_numerator / cur_gcd;
   }
 
-  Fraction &operator*=(const Fraction &other){
+  Fraction &operator*=(const Fraction &other) {
 	int new_denominator = denominator_ * other.denominator_;
 	int new_numerator = numerator_ * other.numerator_;
 	int cur_gcd = gcd(new_denominator, new_numerator);
@@ -64,22 +71,19 @@ class Fraction {
   }
 
  protected:
-  int gcd(int a, int b)
-  {
+  int gcd(int a, int b) {
 	int c = b;
-	while (a%b != 0)
-	{
-	  c = a%b;
+	while (a % b != 0) {
+	  c = a % b;
 	  a = b;
 	  b = c;
 	}
-	return c < 0? -c : c;
+	return c < 0 ? -c : c;
   }
 
-  int lcm(int a, int b){
+  int lcm(int a, int b) {
 	return a * b / gcd(a, b);
   }
-
 
 };
 
@@ -87,23 +91,20 @@ string convert_string(const string &source) {
   stringstream ss;
   vector<char> stk;
   for (size_t i = 0; i < source.length(); i++) {
-	if (source.at(i) == ' '){
+	if (source.at(i) == ' ') {
 	  continue;
-	}
-	else if (isdigit(source.at(i)) || source.at(i) == '/') {
+	} else if (isdigit(source.at(i)) || source.at(i) == '/') {
 	  ss << source.at(i);
 	  // 如果下一位不是数字，或者已经是最后一位，就加上空格
 //	  if ((i < source.length() - 1 && !isdigit(source.at(i + 1)))
 //		  || i == source.length() - 1) {
 //		ss << " ";
 //	  }
-	}
-	else {
+	} else {
 	  ss << " ";
 	  if (stk.empty()) {
 		stk.push_back(source.at(i));
-	  }
-	  else {
+	  } else {
 		switch (source.at(i)) {
 		  case '+':
 		  case '-': {
@@ -118,7 +119,7 @@ string convert_string(const string &source) {
 		  }
 		  case '*': {
 			// '*'出栈
-			while (!stk.empty() && stk.back() == '*'){
+			while (!stk.empty() && stk.back() == '*') {
 			  ss << stk.back();
 			  ss << " ";
 			  stk.pop_back();
@@ -137,4 +138,27 @@ string convert_string(const string &source) {
 	stk.pop_back();
   }
   return ss.str();
+}
+
+Fraction Calculate(const string &source) {
+  vector<string> numbers_ops;
+  vector<Fraction> fractions;
+  int len = Split(source, " ", numbers_ops);
+  for (int i = 0; i < len; i++) {
+	int index = fractions.size();
+	if (numbers_ops[i] == "+") {
+	  fractions[index - 2] += fractions[index - 1];
+	  fractions.pop_back();
+	} else if (numbers_ops[i] == "-") {
+	  fractions[index - 2] -= fractions[index - 1];
+	  fractions.pop_back();
+	} else if (numbers_ops[i] == "*") {
+	  fractions[index - 2] *= fractions[index - 1];
+	  fractions.pop_back();
+	} else {
+	  fractions.push_back(Fraction(numbers_ops[i]));
+	}
+  }
+
+  return fractions[0];
 }

@@ -52,6 +52,7 @@ class Fraction {
 	int cur_gcd = gcd(new_denominator, new_numerator);
 	denominator_ = new_denominator / cur_gcd;
 	numerator_ = new_numerator / cur_gcd;
+	return *this;
   }
 
   Fraction &operator-=(const Fraction &other) {
@@ -60,6 +61,7 @@ class Fraction {
 	int cur_gcd = gcd(new_denominator, new_numerator);
 	denominator_ = new_denominator / cur_gcd;
 	numerator_ = new_numerator / cur_gcd;
+	return *this;
   }
 
   Fraction &operator*=(const Fraction &other) {
@@ -68,6 +70,7 @@ class Fraction {
 	int cur_gcd = gcd(new_denominator, new_numerator);
 	denominator_ = new_denominator / cur_gcd;
 	numerator_ = new_numerator / cur_gcd;
+	return *this;
   }
 
  protected:
@@ -89,6 +92,7 @@ class Fraction {
 
 ostream &operator<<(ostream &s, Fraction f){
   s << f.numerator_ << '/' << f.denominator_;
+  return s;
 }
 
 string convert_string(const string &source) {
@@ -137,14 +141,16 @@ string convert_string(const string &source) {
   }
   // 最后元素需要pop出来
   while (!stk.empty()) {
-	ss << stk.back();
+	// 这时候需要先输入空格
 	ss << " ";
+	ss << stk.back();
 	stk.pop_back();
   }
   return ss.str();
 }
 
 Fraction Calculate(const string &source) {
+  cout << source <<endl;
   vector<string> numbers_ops;
   vector<Fraction> fractions;
   int len = Split(source, " ", numbers_ops);
@@ -167,3 +173,9 @@ Fraction Calculate(const string &source) {
   return fractions[0];
 }
 
+
+int main() {
+  string test1("8-9+3/10+6");
+  cout << Calculate(convert_string(test1));
+
+}

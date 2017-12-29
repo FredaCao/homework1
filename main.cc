@@ -183,8 +183,69 @@ Fraction Calculate(const string &source) {
   return fractions[0];
 }
 
+void test_fraction(){
+  int right_count = 0;
+  Fraction  f1("3/5");
+  Fraction  f2("-3/5");
+  Fraction  f3(f2);
+  Fraction f4 = f3;
+  Fraction f5("32/9");
+  if(f1.numerator_ == 3 && f1.denominator_ == 5) right_count++;
+  if(f2.numerator_ == -3 && f2.denominator_ == 5) right_count++;
+  if(f3.numerator_ == -3 && f3.denominator_ == 5) right_count++;
+  if(f4.numerator_ == -3 && f4.denominator_ == 5) right_count++;
+  f5 *= f1;
+  if(f5.numerator_ == 32 && f5.denominator_ == 15) right_count++;
+  f5 += f1;
+  if(f5.numerator_ == 41 && f5.denominator_ == 15) right_count++;
+  f5 -= f1;
+  if(f5.numerator_ == 32 && f5.denominator_ == 15) right_count++;
+  if(f5 == Fraction("32/15")) right_count++;
+  if( right_count == 8){
+	cout << "fraction class method test passed."<<endl;
+  }
+  else {
+	cout << "fraction class method test failed."<<endl;
+  }
+}
+
+void test_convert_string() {
+  int right_count = 0;
+  if ("8 9 - 3/10 + 6 +" == convert_string("8-9+3/10+6")) right_count++;
+  if ("5/8 2/5 - 4 5 x -" == convert_string("5/8-2/5-4x5")) right_count++;
+  if ("3/4 1/5 + 2/3 1/2 x -" == convert_string("3/4+1/5-2/3x1/2")) right_count++;
+
+  if( right_count == 3){
+	cout << "convert_string method test passed."<<endl;
+  }
+  else {
+	cout << "convert_string method test failed."<<endl;
+  }
+}
+
+void test_calculate() {
+  int right_count = 0;
+  if(Fraction("53/10") == Calculate("8 9 - 3/10 + 6 +")) right_count++;
+  if(Fraction("-791/40") == Calculate("5/8 2/5 - 4 5 x -")) right_count++;
+  if(Fraction("37/60") == Calculate("3/4 1/5 + 2/3 1/2 x -")) right_count++;
+
+  if( right_count == 3){
+	cout << "calculate method test passed."<<endl;
+  }
+  else {
+	cout << "calculate method test failed."<<endl;
+  }
+}
+
+void test(){
+  test_fraction();
+  test_convert_string();
+  test_calculate();
+}
 
 int main(int argc, char **argv) {
+  test();
+
   int count = 0;
   char c;
   while ((c = getopt(argc, argv, "n:")) != EOF) {

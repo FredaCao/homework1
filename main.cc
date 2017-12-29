@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <unistd.h>
 
 using namespace std;
 
@@ -73,6 +74,10 @@ class Fraction {
 	return *this;
   }
 
+  bool operator==(const Fraction &other){
+	return numerator_ == other.numerator_ && denominator_ == other.denominator_;
+  }
+
  protected:
   int gcd(int a, int b) {
 	int c = b;
@@ -91,7 +96,12 @@ class Fraction {
 };
 
 ostream &operator<<(ostream &s, Fraction f){
-  s << f.numerator_ << '/' << f.denominator_;
+  if(f.denominator_ == 1){
+	cout << f.numerator_;
+  }
+  else {
+  	s << f.numerator_ << '/' << f.denominator_;
+  }
   return s;
 }
 
@@ -125,9 +135,9 @@ string convert_string(const string &source) {
 			stk.push_back(source.at(i));
 			break;
 		  }
-		  case '*': {
+		  case 'x': {
 			// '*'出栈
-			while (!stk.empty() && stk.back() == '*') {
+			while (!stk.empty() && stk.back() == 'x') {
 			  ss << stk.back();
 			  ss << " ";
 			  stk.pop_back();
@@ -150,7 +160,7 @@ string convert_string(const string &source) {
 }
 
 Fraction Calculate(const string &source) {
-  cout << source <<endl;
+  //cout << source <<endl;
   vector<string> numbers_ops;
   vector<Fraction> fractions;
   int len = Split(source, " ", numbers_ops);
@@ -162,7 +172,7 @@ Fraction Calculate(const string &source) {
 	} else if (numbers_ops[i] == "-") {
 	  fractions[index - 2] -= fractions[index - 1];
 	  fractions.pop_back();
-	} else if (numbers_ops[i] == "*") {
+	} else if (numbers_ops[i] == "x") {
 	  fractions[index - 2] *= fractions[index - 1];
 	  fractions.pop_back();
 	} else {
@@ -174,8 +184,54 @@ Fraction Calculate(const string &source) {
 }
 
 
-int main() {
+int main(int argc, char **argv) {
+  int count = 0;
+  char c;
+  while ((c = getopt(argc, argv, "n:")) != EOF) {
+	switch (c){
+	  case 'n':{
+		count = atoi(optarg);
+		count = count > 5 ? 5 : count;
+		break;
+	  }
+	  default: break;
+	}
+  }
+
   string test1("8-9+3/10+6");
-  cout << Calculate(convert_string(test1));
+  string test2("5/8-2/5-4x5");
+  string test3("9/10-2/5+7/8-5");
+  string test4("9+10-3+7");
+  string test5("3/4+1/5-2/3x1/2");
+  vector<string> all;
+  all.push_back(test1);
+  all.push_back(test2);
+  all.push_back(test3);
+  all.push_back(test4);
+  all.push_back(test5);
+
+  if(count) cout << "本次共" << count <<"题，满分100分"<<endl;
+  int right_count = 0;
+  for(int i = 0;i<count;i++){
+	cout << i << ": "<<all[i] << "=";
+	string anwser;
+	cin >> anwser;
+	if(Fraction(anwser) == Calculate(convert_string(all[i]))){
+	  cout << endl << "正确！"<<endl;
+	  right_count++;
+	}
+	else {
+	  cout << endl << "不正确。 正确答案：" <<Calculate(convert_string(all[i])) << endl;
+	}
+  }
+  if (count)
+  cout << "您的总分是" << (right_count*100/count) << "分" <<endl;
+
+
+//  cout << Calculate(convert_string(test1))<<endl;
+//  cout << Calculate(convert_string(test2))<<endl;
+//  cout << Calculate(convert_string(test3))<<endl;
+//  cout << Calculate(convert_string(test4))<<endl;
+//  cout << Calculate(convert_string(test5))<<endl;
 
 }
